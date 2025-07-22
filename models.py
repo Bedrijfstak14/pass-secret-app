@@ -11,4 +11,4 @@ class Secret(db.Model):
     views_left = Column(Integer, default=1)
     expire_at = db.Column(db.DateTime, nullable=True)
     def is_expired(self):
-        return self.expire_at and datetime.utcnow() > self.expire_at
+        return self.expire_at and datetime.now(timezone.utc) > self.expire_at
