@@ -9,6 +9,14 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///secrets.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
 
+@app.route('/favicon.ico')
+def favicon():
+    return send_from_directory(
+        os.path.join(app.root_path, 'static'),
+        'favicon.ico',
+        mimetype='image/vnd.microsoft.icon'
+    )
+
 @app.route('/', methods=['GET', 'POST'])
 def index():
     if request.method == 'POST':
