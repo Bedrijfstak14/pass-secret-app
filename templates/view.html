@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Secret</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <div class="container">
+    {% if expired %}
+      <h1>Secret expired</h1>
+      <p>This secret is no longer available.</p>
+    {% else %}
+      <h1>Your secret:</h1>
+      <pre>{{ secret }}</pre>
+    {% endif %}
+  </div>
+</body>
+</html>

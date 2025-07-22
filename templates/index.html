@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Deel een geheim</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>🔐 Tijdelijk geheim delen</h1>
+    <p>
+      Deze tool laat je een bericht invoeren dat slechts beperkt zichtbaar is via een unieke link.
+      Nadat het maximaal ingestelde aantal keer bekeken is, wordt het geheim automatisch verwijderd.
+    </p>
+
+    <h2>Hoe werkt het?</h2>
+    <ul>
+      <li>Vul hieronder een geheime tekst in</li>
+      <li>Kies hoeveel keer de link mag worden bekeken</li>
+      <li>Deel de link met iemand — daarna verdwijnt het automatisch</li>
+    </ul>
+
+    <form method="POST">
+      <div class="form-group">
+        <label for="secret">Je geheime boodschap:</label>
+        <textarea id="secret" name="secret" placeholder="Bijv. WiFi wachtwoord, code, gevoelige info..." required></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="views">Maximaal aantal keer zichtbaar:</label>
+        <input type="number" id="views" name="views" min="1" value="1" required>
+      </div>
+
+      <div class="form-group">
+        <button type="submit">🔗 Genereer geheime link</button>
+      </div>
+    </form>
+  </div>
+</body>
+</html>

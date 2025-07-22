@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Secret Created</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Secret saved</h1>
+    <p>This secret can be viewed <strong>{{ views }}</strong> more time(s).</p>
+    <p>Copy and share this link:</p>
+    <input type="text" value="{{ link }}" readonly onclick="this.select();" />
+  </div>
+</body>
+</html>
+
+
