@@ -14,6 +14,8 @@ Een minimalistische webapplicatie om tijdelijke geheime berichten veilig te dele
 - Cleanup-route beschikbaar voor handmatig opruimen
 - Custom 404-pagina bij verlopen of foutieve links
 - Cloudflare Tunnel (optioneel) voor publieke toegang
+- Voeg via `.env` eigen kleuren toe
+- Voeg aan de map `static` je eigen logo toe
 
 ---
 

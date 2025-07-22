@@ -1,14 +1,30 @@
 from flask import Flask, request, redirect, render_template, send_from_directory
 from models import db, Secret
 from utils import encrypt, decrypt
+from dotenv import load_dotenv
 import os
 import uuid
 from datetime import datetime, timedelta
 
+load_dotenv()
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///secrets.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
+BACKGROUND_COLOR = os.getenv("BACKGROUND_COLOR", "#ffffff")
+BUTTON_COLOR = os.getenv("BUTTON_COLOR", "#007bff")
+
+
+@app.context_processor
+def inject_theme_colors():
+    return {
+        "background_color": BACKGROUND_COLOR,
+        "button_color": BUTTON_COLOR
+    }
+
+@app.route('/static/style.css')
+def dynamic_css():
+    return render_template("style.css.j2"), 200, {'Content-Type': 'text/css'}
 
 @app.route('/favicon.ico')
 def favicon():
@@ -46,7 +62,8 @@ def index():
         db.session.add(secret)
         db.session.commit()
 
-        link = request.host_url + unique_id
+        host = request.host_url.replace("http://", "https://")
+        link = host + unique_id
         return render_template(
             'confirm.html',
             link=link,
