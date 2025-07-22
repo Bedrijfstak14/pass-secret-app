@@ -45,7 +45,7 @@ def index():
         expire_at = None
         if expire_minutes:
             try:
-                expire_at = datetime.utcnow() + timedelta(minutes=int(expire_minutes))
+                expire_at = datetime.now(timezone.utc) + timedelta(minutes=int(expire_minutes))
             except ValueError:
                 pass  # Ongeldige invoer negeren
 
