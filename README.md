@@ -14,6 +14,8 @@ Een minimalistische webapplicatie om tijdelijke geheime berichten veilig te dele
 - Cleanup-route beschikbaar voor handmatig opruimen
 - Custom 404-pagina bij verlopen of foutieve links
 - Cloudflare Tunnel (optioneel) voor publieke toegang
+- Voeg via `.env` eigen kleuren toe
+- Voeg aan de map `static` je eigen logo toe
 
 ---
 
@@ -41,3 +43,5 @@ Maak een `.env` bestand aan in de root van het project met minimaal de volgende 
 
 ```env
 SECRET_KEY=je_super_geheime_sleutel
+BACKGROUND_COLOR=#f0f0f0
+BUTTON_COLOR=#0066cc
