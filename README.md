@@ -43,3 +43,5 @@ Maak een `.env` bestand aan in de root van het project met minimaal de volgende 
 
 ```env
 SECRET_KEY=je_super_geheime_sleutel
+BACKGROUND_COLOR=#f0f0f0
+BUTTON_COLOR=#0066cc
