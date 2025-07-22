@@ -6,12 +6,15 @@
 </head>
 <body>
   <div class="container">
-    <h1>Secret saved</h1>
-    <p>This secret can be viewed <strong>{{ views }}</strong> more time(s).</p>
-    <p>Copy and share this link:</p>
+    <h1>Geheim opgeslagen</h1>
+    <p>Dit geheim kan nog <strong>{{ views }}</strong> keer worden bekeken.</p>
+
+    {% if expire_at %}
+      <p><em>Verloopt op: {{ expire_at }}</em></p>
+    {% endif %}
+
+    <p>Kopieer en deel deze link:</p>
     <input type="text" value="{{ link }}" readonly onclick="this.select();" />
   </div>
 </body>
 </html>
-
-

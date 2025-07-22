@@ -7,11 +7,15 @@
 <body>
   <div class="container">
     {% if expired %}
-      <h1>Secret expired</h1>
-      <p>This secret is no longer available.</p>
+      <h1>Geheim verlopen</h1>
+      <p>Dit geheim is niet meer beschikbaar.</p>
     {% else %}
-      <h1>Your secret:</h1>
+      <h1>Je geheime boodschap:</h1>
       <pre>{{ secret }}</pre>
+
+      {% if expire_at %}
+        <p><em>Verloopt op: {{ expire_at }}</em></p>
+      {% endif %}
     {% endif %}
   </div>
 </body>
