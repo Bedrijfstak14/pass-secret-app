@@ -1,8 +1,9 @@
-from flask import Flask, request, redirect, render_template
+from flask import Flask, request, redirect, render_template, send_from_directory
 from models import db, Secret
 from utils import encrypt, decrypt
 import os
 import uuid
+from datetime import datetime, timedelta
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///secrets.db'
@@ -21,38 +22,86 @@ def favicon():
 def index():
     if request.method == 'POST':
         text = request.form['secret']
-        views = int(request.form['views'])   # gebruiker telt ook mee
+        views = int(request.form['views'])
+        expire_minutes = request.form.get('expire_minutes')
+
+        # Tijdslimiet verwerken
+        expire_at = None
+        if expire_minutes:
+            try:
+                expire_at = datetime.utcnow() + timedelta(minutes=int(expire_minutes))
+            except ValueError:
+                pass  # Ongeldige invoer negeren
+
+        # Encryptie en opslag
         data, nonce = encrypt(text.encode())
-        unique_id = uuid.uuid4().hex  # moeilijk te raden link
-        secret = Secret(id=unique_id, data=data, nonce=nonce, views_left=views)
+        unique_id = uuid.uuid4().hex
+        secret = Secret(
+            id=unique_id,
+            data=data,
+            nonce=nonce,
+            views_left=views,
+            expire_at=expire_at
+        )
         db.session.add(secret)
         db.session.commit()
+
         link = request.host_url + unique_id
-        return render_template('confirm.html', link=link, views=views - 1)
+        return render_template(
+            'confirm.html',
+            link=link,
+            views=views - 1,
+            expire_at=expire_at.strftime("%Y-%m-%d %H:%M UTC") if expire_at else None
+        )
+
     return render_template('index.html')
 
 @app.route('/<secret_id>')
 def view(secret_id):
     secret = Secret.query.get_or_404(secret_id)
+
+    # Tijdslimiet controleren
+    if secret.expire_at and datetime.utcnow() > secret.expire_at:
+        db.session.delete(secret)
+        db.session.commit()
+        return render_template('view.html', secret=None, expired=True)
+
+    # Aantal views controleren
     if secret.views_left <= 0:
         db.session.delete(secret)
         db.session.commit()
         return render_template('view.html', secret=None, expired=True)
+
+    # Geheim decrypten en tonen
     text = decrypt(secret.data, secret.nonce)
     secret.views_left -= 1
-    db.session.add(secret)
+
     if secret.views_left <= 0:
         db.session.delete(secret)
+    else:
+        db.session.add(secret)
+
     db.session.commit()
-    return render_template('view.html', secret=text.decode(), expired=False)
+    return render_template(
+        'view.html',
+        secret=text.decode(),
+        expired=False,
+        expire_at=secret.expire_at.strftime("%Y-%m-%d %H:%M UTC") if secret.expire_at else None
+    )
 
 @app.route('/cleanup')
 def cleanup():
-    expired = Secret.query.filter(Secret.views_left <= 0).all()
+    now = datetime.utcnow()
+    expired = Secret.query.filter(
+        (Secret.views_left <= 0) |
+        ((Secret.expire_at != None) & (Secret.expire_at < now))
+    ).all()
+
     count = len(expired)
     for s in expired:
         db.session.delete(s)
     db.session.commit()
+
     return f"✅ Cleaned {count} expired secrets."
 
 @app.errorhandler(404)
