@@ -1,21 +1,38 @@
+:root {
+  --background: {{ background_color }};
+  --text-color: #333;
+  --container-bg: white;
+  --header-color: #222;
+  --button-bg: {{ button_color }};
+  --button-hover: {{ hover_button_color }};
+  --secret-bg: #f9f9f9;
+  --secret-border: #bbb;
+  --meta-color: #666;
+  --warning-bg: #f2dede;
+  --warning-border: #ebccd1;
+  --warning-text: #a94442;
+}
+
 body {
   font-family: Arial, sans-serif;
-  background: {{ background_color }};
-  color: #333;
+  background: var(--background);
+  color: var(--text-color);
   padding: 2rem;
+  transition: background 0.3s ease, color 0.3s ease;
 }
+
 
 .container {
   max-width: 700px;
   margin: auto;
-  background: white;
+  background: var(--container-bg);
   padding: 2rem;
   border-radius: 8px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
 
 h1, h2 {
-  color: #222;
+  color: var(--header-color);
 }
 
 ul {
@@ -40,10 +57,12 @@ input[type="text"] {
   border: 1px solid #ccc;
   border-radius: 4px;
   resize: vertical;
+  background-color: inherit;
+  color: inherit;
 }
 
 button {
-  background: {{ button_color }};
+  background: var(--button-bg);
   color: white;
   padding: 0.75rem 1.5rem;
   border: none;
@@ -54,7 +73,7 @@ button {
 }
 
 button:hover {
-  background: {{ hover_button_color }};
+  background: var(--button-hover);
 }
 
 header {
@@ -67,9 +86,10 @@ header img {
   max-width: 100%;
   object-fit: contain;
 }
+
 .secret-box {
-  background-color: #f9f9f9;
-  border: 1px dashed #bbb;
+  background-color: var(--secret-bg);
+  border: 1px dashed var(--secret-border);
   padding: 1rem;
   margin-top: 1rem;
   white-space: pre-wrap;
@@ -79,17 +99,43 @@ header img {
 }
 
 .meta-info {
-  color: #666;
+  color: var(--meta-color);
   font-size: 0.9rem;
   margin-top: 0.5rem;
 }
 
 .warning {
-  color: #a94442;
-  background-color: #f2dede;
-  border: 1px solid #ebccd1;
+  color: var(--warning-text);
+  background-color: var(--warning-bg);
+  border: 1px solid var(--warning-border);
   padding: 0.75rem;
   border-radius: 4px;
   margin-top: 1rem;
   font-weight: bold;
+}
+#theme-toggle {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  font-size: 1.5rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  z-index: 1000;
+}
+
+
+.qr-download-button {
+  display: inline-block;
+  background-color: {{ button_color }};
+  color: #fff;
+  padding: 0.6rem 1.2rem;
+  border-radius: 4px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+.qr-download-button:hover {
+  background-color: #0056b3; /* optioneel: een iets donkerdere tint */
 }

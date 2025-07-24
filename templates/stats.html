@@ -2,158 +2,43 @@
 <html lang="nl">
 <head>
   <meta charset="UTF-8">
-  <title>Beheerdersstatistieken</title>
+  <title>Statistieken</title>
   <link rel="stylesheet" href="/static/style.css">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <style>
-    .dashboard {
-      display: flex;
-      flex-direction: column;
-      gap: 2rem;
-    }
-
-    .stats-cards {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 1rem;
-    }
-
-    .card {
-      flex: 1 1 200px;
-      background-color: #f4f4f4;
-      padding: 1.2rem;
-      border-radius: 6px;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.05);
-    }
-
-    .card h2 {
-      margin: 0 0 0.5rem;
-      font-size: 1.2rem;
-    }
-
-    .card p {
-      font-size: 1.8rem;
-      font-weight: bold;
-      color: #007bff;
-      margin: 0;
-    }
-
-    .table-container {
-      overflow-x: auto;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 1rem;
-    }
-
-    th, td {
-      text-align: left;
-      padding: 0.75rem 1rem;
-      border-bottom: 1px solid #ddd;
-    }
-
-    th {
-      background-color: #f8f8f8;
-    }
-
-    canvas {
-      margin-top: 2rem;
-      max-width: 100%;
-    }
-
-    a.back {
-      display: inline-block;
-      margin-top: 2rem;
-      text-decoration: none;
-      color: #007bff;
-    }
-  </style>
+  <link rel="icon" href="/static/favicon.ico" type="image/x-icon">
 </head>
 <body>
   <div class="container">
-    <h1>📈 Statistieken</h1>
+    <h1>📊 Statistieken</h1>
 
-    <div class="dashboard">
+    <h2>Algemene statistieken</h2>
+    <ul>
+      <li>Totaal aantal gedeelde geheimen: <strong>{{ total_secrets }}</strong></li>
+      <li>Totaal aantal bekeken geheimen: <strong>{{ total_views }}</strong></li>
+      <li>Totaal aantal actieve geheimen: <strong>{{ active_secrets }}</strong></li>
+    </ul>
 
-      <div class="stats-cards">
-        <div class="card">
-          <h2>Geheimen aangemaakt</h2>
-          <p>{{ total_created }}</p>
-        </div>
-        <div class="card">
-          <h2>Totaal aantal views</h2>
-          <p>{{ total_views }}</p>
-        </div>
-        <div class="card">
-          <h2>Gemiddelde views/geheim</h2>
-          <p>{{ average_views }}</p>
-        </div>
-        <div class="card">
-          <h2>Actieve geheimen</h2>
-          <p>{{ active_secrets }}</p>
-        </div>
-      </div>
+    <h2>Meest populaire geheimen</h2>
+    <ul>
+      {% for secret in popular_secrets %}
+        <li>
+          <a href="{{ secret.link }}">{{ secret.title }}</a> - Bekeken: {{ secret.views }} keer
+        </li>
+      {% endfor %}
+    </ul>
 
-      <div class="table-container">
-        <h2>📅 Aangemaakte geheimen per dag</h2>
-        <table>
-          <thead>
-            <tr>
-              <th>Datum</th>
-              <th>Aantal</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for date, count in created_per_day %}
-            <tr>
-              <td>{{ date }}</td>
-              <td>{{ count }}</td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
+    <h2>Recent gedeelde geheimen</h2>
+    <ul>
+      {% for secret in recent_secrets %}
+        <li>
+          <a href="{{ secret.link }}">{{ secret.title }}</a> - Gedeeld op: {{ secret.created_at }}
+        </li>
+      {% endfor %}
+    </ul>
 
-      <div>
-        <h2>📊 Grafiek – geheimen per dag</h2>
-        <canvas id="createdChart" height="200"></canvas>
-      </div>
-
-      <a href="/" class="back">⬅️ Terug naar startpagina</a>
-
-    </div>
+    <p style="margin-top: 1rem;">
+      <a href="/">⬅️ Terug naar de startpagina</a>
+    </p>
   </div>
-
-  <script>
-    const ctx = document.getElementById('createdChart').getContext('2d');
-    new Chart(ctx, {
-      type: 'line',
-      data: {
-        labels: [{% for date, count in created_per_day %}"{{ date }}"{% if not loop.last %}, {% endif %}{% endfor %}],
-        datasets: [{
-          label: 'Aangemaakte geheimen per dag',
-          data: [{% for date, count in created_per_day %}{{ count }}{% if not loop.last %}, {% endif %}{% endfor %}],
-          fill: true,
-          backgroundColor: 'rgba(0, 123, 255, 0.2)',
-          borderColor: 'rgba(0, 123, 255, 1)',
-          tension: 0.2,
-          pointRadius: 4,
-        }]
-      },
-      options: {
-        responsive: true,
-        scales: {
-          y: {
-            beginAtZero: true,
-            ticks: {
-              stepSize: 1
-            }
-          }
-        }
-      }
-    });
   </script>
 </body>
 </html>

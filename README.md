@@ -51,6 +51,7 @@ Een minimalistische webapplicatie om tijdelijke geheime berichten veilig te dele
 
 ### `.env` bestand
 
+Genereer een Secret key door middel van python -c "import base64, os; print(base64.urlsafe_b64encode(os.urandom(32)).decode())"
 Maak een `.env` bestand aan in de root van het project met minimaal de volgende variabele:
 
 ```env

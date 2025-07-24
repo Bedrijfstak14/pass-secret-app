@@ -7,15 +7,28 @@ import uuid
 from datetime import datetime, timedelta, timezone
 import sqlite3
 from functools import wraps
+import requests
+import hashlib
+import qrcode
+import io
+import base64
+
 
 load_dotenv()
+
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///secrets.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
 
+WEBHOOK_URL = os.getenv("WEBHOOK_URL")
+WEBHOOK_ENABLED = os.getenv("WEBHOOK_ENABLED", "false").lower() == "true"
+
 BACKGROUND_COLOR = os.getenv("BACKGROUND_COLOR", "#ffffff")
 BUTTON_COLOR = os.getenv("BUTTON_COLOR", "#007bff")
+
+ADMIN_USER = os.getenv("ADMIN_USERNAME")
+ADMIN_PASS = os.getenv("ADMIN_PASSWORD")
 
 @app.context_processor
 def inject_theme_colors():
@@ -42,8 +55,39 @@ def log_event(secret_id, event_type):
     conn.commit()
     conn.close()
 
-ADMIN_USER = os.getenv("ADMIN_USERNAME")
-ADMIN_PASS = os.getenv("ADMIN_PASSWORD")
+def send_webhook_event(event_type, secret_id):
+    if not WEBHOOK_ENABLED or not WEBHOOK_URL:
+        return
+
+    def safe_hash(value):
+        return hashlib.sha256(value.encode()).hexdigest()[:12]
+
+    payload = {
+        "event": event_type,
+        "reference": safe_hash(secret_id),
+        "timestamp": datetime.utcnow().isoformat() + "Z"
+    }
+
+    try:
+        requests.post(WEBHOOK_URL, json=payload, timeout=3)
+        print(f"📡 Webhook verzonden: {event_type} – {payload['reference']}")
+    except Exception as e:
+        print(f"⚠️ Webhook-mislukt: {e}")
+
+@app.route('/qr/<secret_id>.png')
+def qr_image(secret_id):
+    host = request.host_url.replace("http://", "https://")
+    link = host + secret_id
+
+    qr = qrcode.make(link)
+    buffer = io.BytesIO()
+    qr.save(buffer, format="PNG")
+    buffer.seek(0)
+
+    return Response(buffer.read(), mimetype='image/png', headers={
+        "Content-Disposition": f"attachment; filename=qr_{secret_id}.png"
+    })
+
 
 def check_auth(username, password):
     return username == ADMIN_USER and password == ADMIN_PASS
@@ -72,6 +116,13 @@ def favicon():
         mimetype='image/vnd.microsoft.icon'
     )
 
+def generate_qr_code(link: str) -> str:
+    qr = qrcode.make(link)
+    buffer = io.BytesIO()
+    qr.save(buffer, format="PNG")
+    buffer.seek(0)
+    return base64.b64encode(buffer.read()).decode('utf-8')
+
 @app.route('/', methods=['GET', 'POST'])
 def index():
     if request.method == 'POST':
@@ -98,14 +149,18 @@ def index():
         db.session.add(secret)
         db.session.commit()
         log_event(unique_id, 'created')
+        send_webhook_event('created', unique_id)
 
         host = request.host_url.replace("http://", "https://")
         link = host + unique_id
+        qr_code = generate_qr_code(link)
+
         return render_template(
             'confirm.html',
             link=link,
             views=views - 1,
-            expire_at=expire_at.strftime("%Y-%m-%d %H:%M UTC") if expire_at else None
+            expire_at=expire_at.strftime("%Y-%m-%d %H:%M UTC") if expire_at else None,
+            qr_code=qr_code
         )
 
     return render_template('index.html')
@@ -118,12 +173,14 @@ def view(secret_id):
         db.session.delete(secret)
         db.session.commit()
         log_event(secret_id, 'deleted')
+        send_webhook_event('deleted', secret_id)
         return render_template('view.html', secret=None, expired=True)
 
     if secret.views_left <= 0:
         db.session.delete(secret)
         db.session.commit()
         log_event(secret_id, 'deleted')
+        send_webhook_event('deleted', secret_id)
         return render_template('view.html', secret=None, expired=True)
 
     text = decrypt(secret.data, secret.nonce)
@@ -132,18 +189,22 @@ def view(secret_id):
     if secret.views_left <= 0:
         db.session.delete(secret)
         log_event(secret_id, 'deleted')
+        send_webhook_event('deleted', secret_id)
     else:
         db.session.add(secret)
 
     db.session.commit()
     log_event(secret_id, 'viewed')
+    send_webhook_event('viewed', secret_id)
 
     return render_template(
         'view.html',
         secret=text.decode(),
         expired=False,
-        expire_at=secret.expire_at.strftime("%Y-%m-%d %H:%M UTC") if secret.expire_at else None
+        expire_at=secret.expire_at.strftime("%Y-%m-%d %H:%M UTC") if secret.expire_at else None,
+        views_left=secret.views_left
     )
+
 
 @app.route('/cleanup')
 def cleanup():
@@ -156,7 +217,9 @@ def cleanup():
     count = len(expired)
     for s in expired:
         log_event(s.id, 'deleted')
-        db.session.delete(s)
+        send_webhook_event('deleted', s.id)
+    db.session.delete(s)
+
     db.session.commit()
 
     return f"✅ Cleaned {count} expired secrets."
@@ -223,7 +286,6 @@ def create_app():
         conn.close()
 
     return app
-
 
 if __name__ == '__main__':
     create_app()
