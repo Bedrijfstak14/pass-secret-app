@@ -169,7 +169,7 @@ def index():
 def view(secret_id):
     secret = Secret.query.get_or_404(secret_id)
 
-    if secret.expire_at and datetime.utcnow() > secret.expire_at:
+    if secret.expire_at and datetime.now(timezone.utc) > secret.expire_at:
         db.session.delete(secret)
         db.session.commit()
         log_event(secret_id, 'deleted')
