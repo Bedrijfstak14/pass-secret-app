@@ -208,7 +208,7 @@ def view(secret_id):
 
 @app.route('/cleanup')
 def cleanup():
-    now = datetime.utcnow()
+    now = datetime.now(timezone.utc)
     expired = Secret.query.filter(
         (Secret.views_left <= 0) |
         ((Secret.expire_at != None) & (Secret.expire_at < now))
