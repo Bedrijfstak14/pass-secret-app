@@ -42,7 +42,12 @@
     function copySecret() {
       const secret = document.getElementById('secret');
       navigator.clipboard.writeText(secret.innerText).then(() => {
-        alert("Geheim gekopieerd!");
+        const toast = document.getElementById('toast');
+        toast.innerText = "Geheim gekopieerd!";
+        toast.classList.add('show');
+        setTimeout(() => {
+          toast.classList.remove('show');
+        }, 3000);
       });
     }
   </script>
