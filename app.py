@@ -218,7 +218,7 @@ def cleanup():
     for s in expired:
         log_event(s.id, 'deleted')
         send_webhook_event('deleted', s.id)
-    db.session.delete(s)
+        db.session.delete(s)
 
     db.session.commit()
 
