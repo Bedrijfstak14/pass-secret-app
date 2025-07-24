@@ -65,7 +65,7 @@ def send_webhook_event(event_type, secret_id):
     payload = {
         "event": event_type,
         "reference": safe_hash(secret_id),
-        "timestamp": datetime.utcnow().isoformat() + "Z"
+        "timestamp": datetime.now(timezone.utc).isoformat()
     }
 
     try:
