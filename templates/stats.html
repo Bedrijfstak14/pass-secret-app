@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <title>Statistieken</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <link rel="icon" href="/static/favicon.ico" type="image/x-icon">
+</head>
+<body>
+  <div class="container">
+    <h1>📊 Statistieken</h1>
+
+    <h2>Algemene statistieken</h2>
+    <ul>
+      <li>Totaal aantal gedeelde geheimen: <strong>{{ total_created }}</strong></li>
+      <li>Totaal aantal bekeken geheimen: <strong>{{ total_views }}</strong></li>
+      <li>Totaal aantal actieve geheimen: <strong>{{ active_secrets }}</strong></li>
+    </ul>
+
+    <h2>Meest populaire geheimen</h2>
+    <ul>
+      {% for secret in popular_secrets %}
+        <li>
+          <a href="{{ secret.link }}">{{ secret.title }}</a> - Bekeken: {{ secret.views }} keer
+        </li>
+      {% endfor %}
+    </ul>
+
+    <h2>Recent gedeelde geheimen</h2>
+    <ul>
+      {% for secret in recent_secrets %}
+        <li>
+          <a href="{{ secret.link }}">{{ secret.title }}</a> - Gedeeld op: {{ secret.created_at }}
+        </li>
+      {% endfor %}
+    </ul>
+
+    <p style="margin-top: 1rem;">
+      <a href="/">⬅️ Terug naar de startpagina</a>
+    </p>
+  </div>
+</body>
+</html>

@@ -12,6 +12,8 @@ Een minimalistische webapplicatie om tijdelijke geheime berichten veilig te dele
 - Beperk het aantal keer dat een geheim bekeken mag worden
 - Verwijdert automatisch geheimen na het maximale aantal views
 - Cleanup-route beschikbaar voor handmatig opruimen
+- **Statistiekenpagina met overzicht van alle geheimen en views**
+- **Grafische weergave van geheimen per dag via Chart.js**
 - Custom 404-pagina bij verlopen of foutieve links
 - Cloudflare Tunnel (optioneel) voor publieke toegang
 - Voeg via `.env` eigen kleuren toe
@@ -25,7 +27,17 @@ Een minimalistische webapplicatie om tijdelijke geheime berichten veilig te dele
 - Database: SQLite (tijdelijke opslag)
 - Encryptie: AES via de `cryptography`-bibliotheek
 - Frontend: Minimalistische HTML en CSS
+- **Statistieken: Chart.js voor grafieken**
 - Deployment: Docker + docker-compose
+
+---
+
+## Routes
+
+- `/` - Hoofdpagina voor het aanmaken van geheimen
+- `/<uuid>` - Bekijken van geheime berichten
+- `/admin/stats` - Statistiekenoverzicht met grafieken
+- `/cleanup` - Handmatige cleanup van verlopen geheimen
 
 ---
 
@@ -39,9 +51,13 @@ Een minimalistische webapplicatie om tijdelijke geheime berichten veilig te dele
 
 ### `.env` bestand
 
+Genereer een Secret key door middel van python -c "import base64, os; print(base64.urlsafe_b64encode(os.urandom(32)).decode())"
 Maak een `.env` bestand aan in de root van het project met minimaal de volgende variabele:
 
 ```env
 SECRET_KEY=je_super_geheime_sleutel
 BACKGROUND_COLOR=#f0f0f0
 BUTTON_COLOR=#0066cc
+ADMIN_USERNAME=<username>
+ADMIN_PASSWORD=<pass>
+```

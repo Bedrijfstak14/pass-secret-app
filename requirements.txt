@@ -3,3 +3,7 @@ python-dotenv
 cryptography
 sqlalchemy
 flask_sqlalchemy
+requests
+qrcode
+Pillow
+gunicorn

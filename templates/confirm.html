@@ -1,12 +1,15 @@
 <!DOCTYPE html>
-<html>
+<html lang="nl">
 <head>
-  <title>Secret Created</title>
+  <meta charset="UTF-8">
+  <title>Geheim opgeslagen</title>
   <link rel="stylesheet" href="/static/style.css">
+  <link rel="icon" href="/static/favicon.ico" type="image/x-icon">
 </head>
 <body>
   <div class="container">
-    <h1>Geheim opgeslagen</h1>
+    <h1> Geheim opgeslagen</h1>
+
     <p>Dit geheim kan nog <strong>{{ views }}</strong> keer worden bekeken.</p>
 
     {% if expire_at %}
@@ -15,6 +18,19 @@
 
     <p>Kopieer en deel deze link:</p>
     <input type="text" value="{{ link }}" readonly onclick="this.select();" />
+
+    {% if qr_code %}
+      <h2 style="margin-top: 2rem;">Of scan deze QR-code:</h2>
+      <img src="data:image/png;base64,{{ qr_code }}" alt="QR-code voor geheime link" style="max-width: 200px; margin-top: 1rem;">
+    {% endif %}
+    <p style="margin-top: 1rem;">
+      <a href="/qr/{{ link.split('/')[-1] }}.png" download class="qr-download-button">
+        ⬇️ Download QR-code
+      </a>
+    </p>
+    <p style="margin-top: 2rem;">
+      <a href="/">⬅️ Terug naar de startpagina</a>
+    </p>
   </div>
 </body>
 </html>

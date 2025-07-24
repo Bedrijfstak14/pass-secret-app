@@ -1,22 +1,55 @@
 <!DOCTYPE html>
-<html>
+<html lang="nl">
 <head>
-  <title>Secret</title>
+  <meta charset="UTF-8">
+  <title>Geheim bekijken</title>
   <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
   <div class="container">
+
     {% if expired %}
-      <h1>Geheim verlopen</h1>
-      <p>Dit geheim is niet meer beschikbaar.</p>
+      <h1>🔒 Geheim verlopen</h1>
+      <p>Dit geheim is niet meer beschikbaar. Mogelijk is het al bekeken of is het verlopen.</p>
+      <p><a href="/">Maak een nieuw geheim aan</a></p>
+
     {% else %}
-      <h1>Je geheime boodschap:</h1>
-      <pre>{{ secret }}</pre>
+      <h1>Je geheime boodschap</h1>
+
+      <div class="secret-box">
+        <pre id="secret">{{ secret }}</pre>
+      </div>
+
+      <button onclick="copySecret()">Kopieer geheim</button>
+
+      {% if views_left is not none %}
+        <p class="meta-info">🔁 Nog <strong>{{ views_left }}</strong> keer beschikbaar</p>
+      {% endif %}
 
       {% if expire_at %}
-        <p><em>Verloopt op: {{ expire_at }}</em></p>
+        <p class="meta-info">⏳ Verloopt op: <em>{{ expire_at }}</em></p>
       {% endif %}
+
+      <p class="warning">
+        Sluit deze pagina alleen als je het geheim hebt gekopieerd.<br>
+        Het kan daarna niet meer beschikbaar zijn.
+      </p>
     {% endif %}
+
   </div>
+
+  <script>
+    function copySecret() {
+      const secret = document.getElementById('secret');
+      navigator.clipboard.writeText(secret.innerText).then(() => {
+        const toast = document.getElementById('toast');
+        toast.innerText = "Geheim gekopieerd!";
+        toast.classList.add('show');
+        setTimeout(() => {
+          toast.classList.remove('show');
+        }, 3000);
+      });
+    }
+  </script>
 </body>
 </html>
