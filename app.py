@@ -135,7 +135,7 @@ def index():
             try:
                 expire_at = datetime.now(timezone.utc) + timedelta(minutes=int(expire_minutes))
             except ValueError:
-                pass
+                app.logger.warning(f"Invalid expire_minutes value: {expire_minutes}. Defaulting expire_at to None.")
 
         data, nonce = encrypt(text.encode())
         unique_id = uuid.uuid4().hex
