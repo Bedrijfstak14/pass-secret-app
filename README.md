@@ -1,4 +1,4 @@
-# Pass Secret App v1.0
+# Pass Secret App v1.2
 
 Een minimalistische webapplicatie om tijdelijke geheime berichten veilig te delen via unieke links. De link is slechts een beperkt aantal keer te bekijken en vervalt daarna automatisch.
 
